@@ -13,5 +13,7 @@ UCLASS()
 class SPACEBULLETHELL_API APlayerShip : public AUFO
 {
 	GENERATED_BODY()
+
+	int PlayerScore = 0;
 	
 };

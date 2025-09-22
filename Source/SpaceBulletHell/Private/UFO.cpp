@@ -2,6 +2,8 @@
 
 
 #include "UFO.h"
+
+#include "PlayerShip.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -69,8 +71,11 @@ void AUFO::OnOverlap(AActor* MyActor, AActor* OtherActor)
 			Health -= OtherActorDamagePower;
 			if (Health <= 0)
 			{
+				if (APlayerShip* PlayerUFO = Cast<APlayerShip>(OtherUFO))
+				{
+					PlayerUFO->ScoreValue+=ScoreValue;
+				}
 				Destroy();
-				// TODO add score to player if condition are met
 			}
 		} else
 		{
