@@ -72,6 +72,10 @@ void AUFO::OnOverlap(AActor* MyActor, AActor* OtherActor)
 				Destroy();
 				// TODO add score to player if condition are met
 			}
+		} else
+		{
+			// If anything else is touched then it mean it reach the world limit
+			Destroy();
 		}
 	}
 }
@@ -87,7 +91,7 @@ FVector AUFO::Seek()
 	// 4. calculate the steering force
 	FVector vSteering = vDesired - vVelocity;
 	// 5. Limit Steering force to Max speed
-	vSteering.GetClampedToMaxSize(dMaxSpeed);
+	vSteering = vSteering.GetClampedToMaxSize(dMaxSpeed);
 	vSteering.Z = 0.0f; // Keep movement in the XY plane
 	return vSteering;
 }
