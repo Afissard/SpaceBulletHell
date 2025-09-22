@@ -5,7 +5,7 @@
 #include "PlayerShip.h"
 #include "Kismet/GameplayStatics.h"
 
-void AUFO::BeginPlay()
+void AAsteroid::BeginPlay()
 {
 	Super::BeginPlay();
 

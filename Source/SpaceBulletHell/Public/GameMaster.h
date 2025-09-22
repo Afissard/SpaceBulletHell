@@ -11,6 +11,8 @@ UCLASS()
 class SPACEBULLETHELL_API AGameMaster : public AActor
 {
 	GENERATED_BODY()
+
+	float TimeSinceLastSpawn = 0.f;
 	
 public:	
 	// Sets default values for this actor's properties

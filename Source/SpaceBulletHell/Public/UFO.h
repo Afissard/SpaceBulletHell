@@ -12,18 +12,6 @@ class SPACEBULLETHELL_API AUFO : public APawn
 {
 	GENERATED_BODY()
 
-	// Game variables
-	int Health = 1;
-	int MaxHealth = 1;
-	int ScoreValue = 0;
-	int DamagePower = 1;
-
-	// Movement variables
-	FVector vTarget = FVector(0, 0, 0);
-	FVector vPosition = FVector(0, 0, 0);
-	FVector vVelocity = FVector(0, 0, 0);
-	float dMaxSpeed = 10;
-
 	// Hit box & mesh
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* SphereCollision; 
@@ -35,6 +23,23 @@ class SPACEBULLETHELL_API AUFO : public APawn
 public:
 	// Sets default values for this pawn's properties
 	AUFO();
+
+	// Game variables
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	int Health = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	int MaxHealth = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	int ScoreValue = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	int DamagePower = 1;
+
+	// Movement variables
+	FVector vTarget = FVector(0, 0, 0);
+	FVector vPosition = FVector(0, 0, 0);
+	FVector vVelocity = FVector(0, 0, 0);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float dMaxSpeed = 10;
 
 protected:
 	// Called when the game starts or when spawned

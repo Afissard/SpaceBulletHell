@@ -23,8 +23,10 @@ void AGameMaster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (DeltaTime/=1.f < 0.01f) { // every 1 second
+	TimeSinceLastSpawn += DeltaTime;
+	if (TimeSinceLastSpawn >= 1.f) {
 		spawnAsteroid();
+		TimeSinceLastSpawn = 0.f;
 	}
 
 }
