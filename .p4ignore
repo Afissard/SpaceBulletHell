@@ -1,0 +1,64 @@
+# Unreal Engine - fichiers générés automatiquement
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+*.xcuserdata/
+.vscode/
+.vs/
+
+# Fichiers de build
+Build/*/Binaries/
+Build/*/Intermediate/
+Build/*/Saved/
+
+# Rider / IntelliJ
+.idea/
+*.iml
+cmake-build-*/
+
+# Visual Studio / Visual Studio Code
+.vs/
+.vscode/
+*.code-workspace
+
+# Logs
+*.log
+*.tlog
+
+# Cache et temporaires
+*.opensdf
+*.sdf
+*.suo
+*.user
+*.userprefs
+*.ipch
+*.db
+*.opendb
+
+# Sauvegardes / autosaves
+*_Backup/*
+*_Autosaves/*
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Git spécifique
+.git/
+.gitignore
+.gitattributes
+
+# Perforce spécifique
+.p4ignore
+.p4config
+
+# (Optionnel) si tu utilises RiderLink (plugin Unreal pour Rider),
+# garde seulement le plugin source, ignore le reste si généré :
+Plugins/Developer/RiderLink/Intermediate/
+Plugins/Developer/RiderLink/Binaries/
