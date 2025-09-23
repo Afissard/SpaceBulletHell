@@ -30,6 +30,9 @@ AUFO::AUFO()
 	StaticMesh->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 	SphereCollision->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
 
+	// Movement
+	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	MovementComponent->UpdatedComponent = RootComponent;
 }
 
 // Called when the game starts or when spawned
@@ -49,8 +52,10 @@ void AUFO::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector MoveDirection = Seek();
-	AddMovementInput(MoveDirection, 1.0f);
+	// TODO FIX: use the movement component
+	FVector NewLocation = GetActorLocation() + Inertia * DeltaTime;
+	NewLocation.Z = 0.f; // Reste dans le plan XY
+	SetActorLocation(NewLocation);
 }
 
 // Called to bind functionality to input
@@ -65,6 +70,8 @@ void AUFO::OnOverlap(AActor* MyActor, AActor* OtherActor)
 	// Check if the overlapping actor is valid and not itself
 	if (OtherActor && (OtherActor != MyActor))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Collision avec : %s"), *OtherActor->GetName());
+		
 		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
 		{
 			int OtherActorDamagePower = OtherUFO->GetDamagePower();
@@ -85,6 +92,7 @@ void AUFO::OnOverlap(AActor* MyActor, AActor* OtherActor)
 	}
 }
 
+/*
 FVector AUFO::Seek()
 {
 	// 1. calculate the desired velocity
@@ -99,4 +107,21 @@ FVector AUFO::Seek()
 	vSteering = vSteering.GetClampedToMaxSize(dMaxSpeed);
 	vSteering.Z = 0.0f; // Keep movement in the XY plane
 	return vSteering;
+}
+*/
+
+void AUFO::SpaceMovementApplyForce(const FVector ForceToApply)
+{
+	// Applique la force uniquement sur X et Y
+	Inertia.X += ForceToApply.X;
+	Inertia.Y += ForceToApply.Y;
+	Inertia.Z = 0.0f; // Pas de mouvement sur Z
+
+	// Limite la vitesse maximale
+	Inertia = Inertia.GetClampedToMaxSize(MovementComponent->MaxSpeed);
+
+	// Applique l'inertie au mouvement
+	MovementComponent->AddInputVector(Inertia);
+
+	//UE_LOG(LogTemp, Warning, TEXT("%s (%s) inertia: %s"), *GetActorNameOrLabel(), *GetActorLocation().ToString(), *Inertia.ToString());
 }

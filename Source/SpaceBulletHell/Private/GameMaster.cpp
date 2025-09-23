@@ -24,7 +24,7 @@ void AGameMaster::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	TimeSinceLastSpawn += DeltaTime;
-	if (TimeSinceLastSpawn >= 1.f) {
+	if (TimeSinceLastSpawn >= 5.f) {
 		spawnAsteroid();
 		TimeSinceLastSpawn = 0.f;
 	}
@@ -34,11 +34,16 @@ void AGameMaster::Tick(float DeltaTime)
 void AGameMaster::spawnAsteroid()
 {
 	FVector SpawnLocation(
-		FMath::RandRange(-1000.f, 1000.f),
-		FMath::RandRange(-1000.f, 1000.f),
+		FMath::RandRange(-500.f, 500.f),
+		FMath::RandRange(-500.f, 500.f),
 		0.f
 	);
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
-	GetWorld()->SpawnActor<AAsteroid>(AsteroidClass, SpawnLocation, SpawnRotation);
+	//GetWorld()->SpawnActor<AAsteroid>(AsteroidClass, SpawnLocation, SpawnRotation);
+
+	FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    GetWorld()->SpawnActor<AAsteroid>(AsteroidClass, SpawnLocation, SpawnRotation, SpawnParams);
+	
 }

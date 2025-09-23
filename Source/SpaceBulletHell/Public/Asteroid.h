@@ -16,5 +16,7 @@ class SPACEBULLETHELL_API AAsteroid : public AUFO
 
 protected:
 	virtual void BeginPlay() override;
-	
+
+public:
+	virtual void Tick(float DeltaTime) override;
 };

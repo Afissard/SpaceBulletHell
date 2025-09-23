@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "UFO.generated.h"
 
 UCLASS()
@@ -35,12 +36,11 @@ public:
 	int DamagePower = 1;
 
 	// Movement variables
-	FVector vTarget = FVector(0, 0, 0);
-	FVector vPosition = FVector(0, 0, 0);
-	FVector vVelocity = FVector(0, 0, 0);
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float dMaxSpeed = 10;
-
+	FVector Inertia = FVector(0, 0, 0);
+	UPROPERTY(VisibleAnywhere)
+	UFloatingPawnMovement* MovementComponent;
+	
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -57,6 +57,7 @@ public:
 	UFUNCTION()
 	void OnOverlap(AActor* MyActor, AActor* OtherActor);
 
-	FVector Seek();
+	//FVector Seek();
 
+	void SpaceMovementApplyForce(const FVector ForceToApply);
 };
