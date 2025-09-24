@@ -35,6 +35,9 @@ public:
 	
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditAnywhere, Category = "Missile")
+	TSubclassOf<class AMissile> MissileClass;
+
 	UFUNCTION()
 	void ThrustForward(float Value);
 	UFUNCTION()

@@ -3,6 +3,9 @@
 
 #include "PlayerShip.h"
 
+#include "Missile.h"
+#include "Kismet/GameplayStatics.h"
+
 APlayerShip::APlayerShip()
 	: AUFO() // Appelle le constructeur parent
 {
@@ -57,5 +60,21 @@ void APlayerShip::ThrustRight(float Value)
 
 void APlayerShip::FireProjectile()
 {
-	// Logique de spawn de projectile à ajouter plus tard
+	APlayerShip* Player = Cast<APlayerShip>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!Player) return;
+
+	FVector Forward = Player->GetActorForwardVector();
+	FVector SpawnLocation = Player->GetActorLocation() + Forward * 100.f;
+
+	FVector MissileInertia = FVector(1.f, 0.f, 0.f) * 20.f;
+
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+	FActorSpawnParameters SpawnParams;
+
+	AMissile* NewMissile = GetWorld()->SpawnActor<AMissile>(MissileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	if (NewMissile)
+	{
+		NewMissile->Init(MissileInertia);
+	}
+	
 }

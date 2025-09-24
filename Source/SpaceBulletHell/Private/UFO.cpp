@@ -108,25 +108,6 @@ void AUFO::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 	}
 }
 
-
-/*
-FVector AUFO::Seek()
-{
-	// 1. calculate the desired velocity
-	FVector vDesired = vTarget - vPosition;
-	// 2. normalize the desired velocity
-	vDesired.Normalize();
-	// 3. scale the desired velocity to the maximum speed
-	vDesired *= dMaxSpeed;
-	// 4. calculate the steering force
-	FVector vSteering = vDesired - vVelocity;
-	// 5. Limit Steering force to Max speed
-	vSteering = vSteering.GetClampedToMaxSize(dMaxSpeed);
-	vSteering.Z = 0.0f; // Keep movement in the XY plane
-	return vSteering;
-}
-*/
-
 void AUFO::SpaceMovementApplyForce(const FVector ForceToApply)
 {
 	// Applique la force uniquement sur X et Y

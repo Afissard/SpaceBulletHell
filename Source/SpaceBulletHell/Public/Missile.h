@@ -4,21 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "UFO.h"
-#include "Asteroid.generated.h"
+#include "Missile.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SPACEBULLETHELL_API AAsteroid : public AUFO
+class SPACEBULLETHELL_API AMissile : public AUFO
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void BeginPlay() override;
-
 public:
+	void AMssile();
+	
 	virtual void Tick(float DeltaTime) override;
 
-	void Init(FVector newInertia, int newMaxHealth);
+	void Init(FVector newInertia);
+	
 };
