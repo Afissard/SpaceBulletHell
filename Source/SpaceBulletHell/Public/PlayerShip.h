@@ -16,6 +16,9 @@ class SPACEBULLETHELL_API APlayerShip : public AUFO
 
 	int PlayerScore = 0;
 
+public:
+	APlayerShip();
+
 protected:
 	// Accélération appliquée lors de la poussée
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")

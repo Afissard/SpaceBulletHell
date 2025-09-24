@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/SphereComponent.h"
+#include "PaperSpriteComponent.h"
+#include "PaperSprite.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "UFO.generated.h"
 
@@ -13,17 +15,15 @@ class SPACEBULLETHELL_API AUFO : public APawn
 {
 	GENERATED_BODY()
 
-	// Hit box & mesh
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* SphereCollision; 
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* StaticMesh;
-	
-
 public:
 	// Sets default values for this pawn's properties
 	AUFO();
+
+	// Hit box & mesh
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* SphereCollision; 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPaperSpriteComponent* SpriteComponent;
 
 	// Game variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")

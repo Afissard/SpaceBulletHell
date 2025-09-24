@@ -3,6 +3,19 @@
 
 #include "PlayerShip.h"
 
+APlayerShip::APlayerShip()
+	: AUFO() // Appelle le constructeur parent
+{
+	SphereCollision->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
+
+	// Game variables
+	MaxHealth = 5;
+	Health = MaxHealth;
+	DamagePower = 1;
+	ScoreValue = 0;
+	
+}
+
 void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

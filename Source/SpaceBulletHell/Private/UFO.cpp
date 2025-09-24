@@ -18,17 +18,17 @@ AUFO::AUFO()
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	RootComponent = SphereCollision;
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(SphereCollision);
 	
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-	if (SphereMesh.Succeeded())
-	{
-		StaticMesh->SetStaticMesh(SphereMesh.Object);
-	}
+	SpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("SpriteComponent"));
+	SpriteComponent->SetupAttachment(SphereCollision);
 
-	SetActorScale3D(FVector(0.3f, 0.3f, 0.3f));
-	StaticMesh->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
+	// Pour définir le sprite, utilisez un asset existant
+	static ConstructorHelpers::FObjectFinderOptional<UPaperSprite> SpriteAsset(TEXT("/Game/Sprites/UFO_Sprite.UFO_Sprite"));
+	if (SpriteAsset.Get())
+	{
+		SpriteComponent->SetSprite(SpriteAsset.Get());
+	}
+	
 	SphereCollision->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
 	
 	// Movement
