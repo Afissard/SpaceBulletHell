@@ -18,6 +18,9 @@ public:
 	// Sets default values for this actor's properties
 	AGameMaster();
 
+	UPROPERTY(EditAnywhere, Category = "Game Rules")
+	int SpawnRateAsteroid = 3; // Asteroid per second
+
 	UPROPERTY(EditAnywhere, Category = "Asteroid")
 	TSubclassOf<class AAsteroid> AsteroidClass;
 

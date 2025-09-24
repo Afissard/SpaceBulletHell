@@ -12,7 +12,8 @@ AUFO::AUFO()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	
 	// Hit box & mesh
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	RootComponent = SphereCollision;
@@ -29,7 +30,7 @@ AUFO::AUFO()
 	SetActorScale3D(FVector(0.3f, 0.3f, 0.3f));
 	StaticMesh->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 	SphereCollision->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
-
+	
 	// Movement
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
 	MovementComponent->UpdatedComponent = RootComponent;
@@ -39,7 +40,7 @@ AUFO::AUFO()
 void AUFO::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AUFO::OnOverlap);	
 }
 
 int AUFO::GetDamagePower()
@@ -52,10 +53,24 @@ void AUFO::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// TODO FIX: use the movement component
-	FVector NewLocation = GetActorLocation() + Inertia * DeltaTime;
-	NewLocation.Z = 0.f; // Reste dans le plan XY
-	SetActorLocation(NewLocation);
+	// Out of bounds
+	if (GetActorLocation().X < -5000.f ||
+		GetActorLocation().X > 5000.f ||
+		GetActorLocation().Y < -5000.f ||
+		GetActorLocation().Y > 5000.f
+		)
+	{
+		Destroy();
+		return;
+	}
+
+	// Deatch check
+	if (Health <= 0)
+	{
+		Destroy();
+		return;
+	}
+
 }
 
 // Called to bind functionality to input
@@ -65,13 +80,14 @@ void AUFO::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AUFO::OnOverlap(AActor* MyActor, AActor* OtherActor)
+void AUFO::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+					 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+					 bool bFromSweep, const FHitResult& SweepResult)
 {
-	// Check if the overlapping actor is valid and not itself
-	if (OtherActor && (OtherActor != MyActor))
+	UE_LOG(LogTemp, Warning, TEXT("Collision with : %s"), *OtherActor->GetName());
+
+	if (OtherActor && OtherActor != this)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Collision avec : %s"), *OtherActor->GetName());
-		
 		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
 		{
 			int OtherActorDamagePower = OtherUFO->GetDamagePower();
@@ -80,17 +96,18 @@ void AUFO::OnOverlap(AActor* MyActor, AActor* OtherActor)
 			{
 				if (APlayerShip* PlayerUFO = Cast<APlayerShip>(OtherUFO))
 				{
-					PlayerUFO->ScoreValue+=ScoreValue;
+					PlayerUFO->ScoreValue += ScoreValue;
 				}
 				Destroy();
 			}
-		} else
+		}
+		else
 		{
-			// If anything else is touched then it mean it reach the world limit
 			Destroy();
 		}
 	}
 }
+
 
 /*
 FVector AUFO::Seek()
