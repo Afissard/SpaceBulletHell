@@ -37,7 +37,10 @@ void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerShip::ThrustForward);
 	PlayerInputComponent->BindAxis("ThrustRight", this, &APlayerShip::ThrustRight);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::FireProjectile);
+	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::FireProjectile);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::StartFireMissile);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerShip::StopFireMissile);
 }
 
 void APlayerShip::ThrustForward(float Value)
@@ -56,6 +59,17 @@ void APlayerShip::ThrustRight(float Value)
 		FVector Force = GetActorRightVector() * Value * Acceleration;
 		SpaceMovementApplyForce(Force);
 	}
+}
+
+void APlayerShip::StartFireMissile()
+{
+	FireProjectile();
+	GetWorld()->GetTimerManager().SetTimer(FireTimerHandle, this, &APlayerShip::FireProjectile, FireInterval, true);
+}
+
+void APlayerShip::StopFireMissile()
+{
+	GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
 }
 
 void APlayerShip::FireProjectile()

@@ -38,6 +38,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Missile")
 	TSubclassOf<class AMissile> MissileClass;
 
+	FTimerHandle FireTimerHandle;
+	UPROPERTY(EditAnywhere, Category = "Missile")
+	float FireInterval = 0.2f; // Intervalle entre tirs
+
+	void StartFireMissile();
+	void StopFireMissile();
+	void FireMissile();
+	
 	UFUNCTION()
 	void ThrustForward(float Value);
 	UFUNCTION()
