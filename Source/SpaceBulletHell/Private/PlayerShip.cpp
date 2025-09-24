@@ -64,7 +64,7 @@ void APlayerShip::FireProjectile()
 	if (!Player) return;
 
 	FVector Forward = Player->GetActorForwardVector();
-	FVector SpawnLocation = Player->GetActorLocation() + Forward * 100.f;
+	FVector SpawnLocation = Player->GetActorLocation() + Forward * 75.f;
 
 	FVector MissileInertia = FVector(1.f, 0.f, 0.f) * 20.f;
 
