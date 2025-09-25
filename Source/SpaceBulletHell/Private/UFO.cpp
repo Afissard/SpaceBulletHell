@@ -90,6 +90,7 @@ void AUFO::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 		{
 			
 			AGameMaster* GM = Cast<AGameMaster>(UGameplayStatics::GetActorOfClass(GetWorld(), AGameMaster::StaticClass()));
+			if (GM)
 			{
 				if (APlayerShip* PlayerUFO = Cast<APlayerShip>(OtherUFO))
 				{
