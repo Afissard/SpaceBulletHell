@@ -4,6 +4,7 @@
 #include "UFO.h"
 
 #include "PlayerShip.h"
+#include "Missile.h"
 #include "Components/SphereComponent.h"
 
 // Sets default values
@@ -43,11 +44,6 @@ void AUFO::BeginPlay()
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AUFO::OnOverlap);	
 }
 
-int AUFO::GetDamagePower()
-{
-	return DamagePower;
-}
-
 // Called every frame
 void AUFO::Tick(float DeltaTime)
 {
@@ -84,26 +80,25 @@ void AUFO::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 					 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 					 bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Collision with : %s"), *OtherActor->GetName());
-
 	if (OtherActor && OtherActor != this)
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("%s collided with : %s"), *GetActorNameOrLabel(), *OtherActor->GetName());
+
 		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
 		{
-			int OtherActorDamagePower = OtherUFO->GetDamagePower();
-			Health -= OtherActorDamagePower;
+			Health -= OtherUFO->DamagePower;
 			if (Health <= 0)
 			{
 				if (APlayerShip* PlayerUFO = Cast<APlayerShip>(OtherUFO))
 				{
-					PlayerUFO->ScoreValue += ScoreValue;
+					// TODO move score handling to GameMaster
+				}
+				if (AMissile* MissileUFO = Cast<AMissile>(OtherUFO))
+				{
+					// TODO move score handling to GameMaster
 				}
 				Destroy();
 			}
-		}
-		else
-		{
-			Destroy();
 		}
 	}
 }

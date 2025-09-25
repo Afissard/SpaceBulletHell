@@ -3,6 +3,7 @@
 
 #include "PlayerShip.h"
 
+#include "Asteroid.h"
 #include "Missile.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -21,6 +22,8 @@ void APlayerShip::BeginPlay()
 	Health = MaxHealth;
 	DamagePower = 1;
 	ScoreValue = 0;
+
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &APlayerShip::OnOverlap);
 }
 
 void APlayerShip::Tick(float DeltaTime)
@@ -90,5 +93,26 @@ void APlayerShip::FireProjectile()
 	{
 		NewMissile->Init(MissileInertia);
 	}
-	
+}
+
+void APlayerShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+				   bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("%s collided with : %s"), *GetActorNameOrLabel(), *OtherActor->GetName());
+
+		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
+		{
+			if (AAsteroid* AsteroidUFO = Cast<AAsteroid>(OtherUFO))
+			{
+				Health -= AsteroidUFO->DamagePower;
+			}
+			if (Health <= 0)
+			{
+				Destroy();
+			}
+		}
+	}
 }

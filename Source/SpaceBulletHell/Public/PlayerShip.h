@@ -44,7 +44,6 @@ public:
 
 	void StartFireMissile();
 	void StopFireMissile();
-	void FireMissile();
 	
 	UFUNCTION()
 	void ThrustForward(float Value);
@@ -52,4 +51,10 @@ public:
 	void ThrustRight(float Value);
 	UFUNCTION()
 	void FireProjectile();
+
+	//UFUNCTION()
+	void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+				   bool bFromSweep, const FHitResult& SweepResult
+				   ) override;
 };

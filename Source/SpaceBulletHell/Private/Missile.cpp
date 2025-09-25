@@ -3,6 +3,8 @@
 
 #include "Missile.h"
 
+#include "Asteroid.h"
+
 /*
 FVector AUFO::Seek()
 {
@@ -40,4 +42,27 @@ void AMissile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	SpaceMovementApplyForce(FVector(0.f, 0.f, 0.f));
+
+	if (ToBeDestroyedNextFrame)
+	{
+		Destroy();
+	}
+}
+
+void AMissile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+				   bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("%s collided with : %s"), *GetActorNameOrLabel(), *OtherActor->GetName());
+
+		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
+		{
+			if (AAsteroid* AsteroidUFO = Cast<AAsteroid>(OtherUFO))
+			{
+				ToBeDestroyedNextFrame = true;
+			}
+		}
+	}
 }
