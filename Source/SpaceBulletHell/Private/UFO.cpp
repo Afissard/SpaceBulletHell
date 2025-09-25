@@ -58,14 +58,14 @@ void AUFO::Tick(float DeltaTime)
 		GetActorLocation().Y > 5000.f
 		)
 	{
-		Destroy();
+		Kill();
 		return;
 	}
 
 	// Deatch check
 	if (Health <= 0)
 	{
-		Destroy();
+		Kill();
 		return;
 	}
 
@@ -105,7 +105,7 @@ void AUFO::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 			Health -= OtherUFO->DamagePower;
 			if (Health <= 0)
 			{
-				Destroy();
+				Kill();
 			}
 		}
 	}
@@ -125,4 +125,10 @@ void AUFO::SpaceMovementApplyForce(const FVector ForceToApply)
 	MovementComponent->AddInputVector(Inertia);
 
 	//UE_LOG(LogTemp, Warning, TEXT("%s (%s) inertia: %s"), *GetActorNameOrLabel(), *GetActorLocation().ToString(), *Inertia.ToString());
+}
+
+void AUFO::Kill()
+{
+	// TODO : add explosion particles + sound
+	Destroy();
 }

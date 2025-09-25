@@ -60,8 +60,7 @@ public:
                    bool bFromSweep, const FHitResult& SweepResult
                    );
 	
-
-	//FVector Seek();
-
 	void SpaceMovementApplyForce(const FVector ForceToApply);
+
+	void Kill();
 };

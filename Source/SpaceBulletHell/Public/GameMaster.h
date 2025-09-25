@@ -26,6 +26,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	int PlayerScore = 0;
+	int PlayerUpgrade = 0;
+	int PreviousPlayerUpgrade = PlayerUpgrade;
 
 protected:
 	// Called when the game starts or when spawned

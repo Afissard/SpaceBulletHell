@@ -35,6 +35,18 @@ void AGameMaster::Tick(float DeltaTime)
 		TimeSinceLastSpawn = 0.f;
 	}
 
+	PlayerUpgrade = PlayerScore / 100;
+	
+	if (PreviousPlayerUpgrade != PlayerUpgrade)
+	{
+		PreviousPlayerUpgrade = PlayerUpgrade;
+		APlayerShip* Player = Cast<APlayerShip>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (Player)
+		{
+			Player->MaxHealth = 5 + PlayerUpgrade;
+			Player->Health += 1;
+		}
+	}
 }
 
 void AGameMaster::spawnAsteroid()
@@ -47,7 +59,7 @@ void AGameMaster::spawnAsteroid()
 
 	// Choisit un angle aléatoire autour du joueur
 	//	float Angle = FMath::RandRange(0.f, 2 * PI);
-	float SpawnDistance = FMath::RandRange(2000.f, 3000.f); // Distance éloignée
+	float SpawnDistance = FMath::RandRange(1500.f, 2000.f); // Distance éloignée
 
 	// Calcule la position de spawn autour du joueur
 	float Angle = FMath::RandRange(-PI / 2, PI / 2); // De -90° à +90°

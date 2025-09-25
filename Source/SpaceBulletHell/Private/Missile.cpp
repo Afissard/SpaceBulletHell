@@ -62,6 +62,9 @@ void AMissile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Other
 			if (AAsteroid* AsteroidUFO = Cast<AAsteroid>(OtherUFO))
 			{
 				ToBeDestroyedNextFrame = true;
+
+				// FIX: Mask the hitbox issues
+				//DamagePower = 0; // Prevents double damage if multiple collisions in the same frame
 			}
 		}
 	}
