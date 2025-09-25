@@ -3,9 +3,11 @@
 
 #include "UFO.h"
 
+#include "GameMaster.h"
 #include "PlayerShip.h"
 #include "Missile.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AUFO::AUFO()
@@ -86,17 +88,22 @@ void AUFO::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 
 		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
 		{
-			Health -= OtherUFO->DamagePower;
-			if (Health <= 0)
+			
+			AGameMaster* GM = Cast<AGameMaster>(UGameplayStatics::GetActorOfClass(GetWorld(), AGameMaster::StaticClass()));
 			{
 				if (APlayerShip* PlayerUFO = Cast<APlayerShip>(OtherUFO))
 				{
-					// TODO move score handling to GameMaster
+					GM->PlayerScore += ScoreValue;
 				}
 				if (AMissile* MissileUFO = Cast<AMissile>(OtherUFO))
 				{
-					// TODO move score handling to GameMaster
+					GM->PlayerScore += ScoreValue;
 				}
+			}
+			
+			Health -= OtherUFO->DamagePower;
+			if (Health <= 0)
+			{
 				Destroy();
 			}
 		}

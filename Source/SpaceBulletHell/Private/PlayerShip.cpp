@@ -20,7 +20,7 @@ void APlayerShip::BeginPlay()
 	// Game variables
 	MaxHealth = 5;
 	Health = MaxHealth;
-	DamagePower = 1;
+	DamagePower = 5;
 	ScoreValue = 0;
 
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &APlayerShip::OnOverlap);
@@ -29,7 +29,28 @@ void APlayerShip::BeginPlay()
 void APlayerShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+	FVector Location = GetActorLocation();
+	float WorldLimitX = 750.f;
+	float WorldLimitY = 1300.f;
+
+	if (
+		FMath::Abs(Location.X) > WorldLimitX ||
+		FMath::Abs(Location.Y) > WorldLimitY ||
+		FMath::Abs(Location.X) < WorldLimitX*(-1) ||
+		FMath::Abs(Location.Y) < WorldLimitY*(-1)
+		)
+	{
+		SetActorLocation(FVector(0.f, 0.f, Location.Z));
+		Health -= 1;
+	}
+
+	/*
+	if (Health <= 0)
+	{
+		Destroy();
+	}
+	*/
 }
 
 void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -109,10 +130,12 @@ void APlayerShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			{
 				Health -= AsteroidUFO->DamagePower;
 			}
+			/*
 			if (Health <= 0)
 			{
 				Destroy();
 			}
+			*/
 		}
 	}
 }
