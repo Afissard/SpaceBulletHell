@@ -3,6 +3,57 @@
 
 #include "PlayerShip.h"
 
+#include "Asteroid.h"
+#include "GameMaster.h"
+#include "Missile.h"
+#include "Kismet/GameplayStatics.h"
+
+APlayerShip::APlayerShip()
+	: AUFO() // Appelle le constructeur parent
+{
+	SphereCollision->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
+}
+
+void APlayerShip::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	// Game variables
+	MaxHealth = 5;
+	Health = MaxHealth;
+	DamagePower = 0;
+	ScoreValue = 0;
+
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &APlayerShip::OnOverlap);
+}
+
+void APlayerShip::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	FVector Location = GetActorLocation();
+	float WorldLimitX = 750.f;
+	float WorldLimitY = 1300.f;
+
+	if (
+		FMath::Abs(Location.X) > WorldLimitX ||
+		FMath::Abs(Location.Y) > WorldLimitY ||
+		FMath::Abs(Location.X) < WorldLimitX*(-1) ||
+		FMath::Abs(Location.Y) < WorldLimitY*(-1)
+		)
+	{
+		SetActorLocation(FVector(0.f, 0.f, Location.Z));
+		Health -= 1;
+	}
+
+	/*
+	if (Health <= 0)
+	{
+		Destroy();
+	}
+	*/
+}
+
 void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -10,7 +61,11 @@ void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	check(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerShip::ThrustForward);
-	PlayerInputComponent->BindAxis("TurnRight", this, &APlayerShip::TurnRight);
+	PlayerInputComponent->BindAxis("ThrustRight", this, &APlayerShip::ThrustRight);
+	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::FireProjectile);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerShip::StartFireMissile);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerShip::StopFireMissile);
 }
 
 void APlayerShip::ThrustForward(float Value)
@@ -22,10 +77,74 @@ void APlayerShip::ThrustForward(float Value)
 	}
 }
 
-void APlayerShip::TurnRight(float Value)
+void APlayerShip::ThrustRight(float Value)
 {
 	if (Value != 0.0f)
 	{
-		AddControllerYawInput(Value * TurnSpeed * GetWorld()->GetDeltaSeconds());
+		FVector Force = GetActorRightVector() * Value * Acceleration;
+		SpaceMovementApplyForce(Force);
+	}
+}
+
+void APlayerShip::StartFireMissile()
+{
+	FireProjectile();
+	GetWorld()->GetTimerManager().SetTimer(FireTimerHandle, this, &APlayerShip::FireProjectile, FireInterval, true);
+}
+
+void APlayerShip::StopFireMissile()
+{
+	GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
+}
+
+void APlayerShip::FireProjectile()
+{
+	APlayerShip* Player = Cast<APlayerShip>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!Player) return;
+
+	FVector Forward = Player->GetActorForwardVector();
+	FVector SpawnLocation = Player->GetActorLocation() + Forward * 75.f;
+
+	FVector MissileInertia = FVector(1.f, 0.f, 0.f) * 20.f;
+
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+	FActorSpawnParameters SpawnParams;
+
+	AMissile* NewMissile = GetWorld()->SpawnActor<AMissile>(MissileClass, SpawnLocation, SpawnRotation, SpawnParams);
+	if (NewMissile)
+	{
+		NewMissile->Init(MissileInertia);
+	}
+}
+
+void APlayerShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+				   bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("%s collided with : %s"), *GetActorNameOrLabel(), *OtherActor->GetName());
+
+		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
+		{
+			if (AAsteroid* AsteroidUFO = Cast<AAsteroid>(OtherUFO))
+			{
+				Health -= AsteroidUFO->DamagePower;
+
+				AGameMaster* GM = Cast<AGameMaster>(UGameplayStatics::GetActorOfClass(GetWorld(), AGameMaster::StaticClass()));
+				if (GM)
+				{
+					GM->PlayerScore += AsteroidUFO->ScoreValue;
+				}
+				
+				AsteroidUFO->Destroy();
+			}
+			/*
+			if (Health <= 0)
+			{
+				Destroy();
+			}
+			*/
+		}
 	}
 }

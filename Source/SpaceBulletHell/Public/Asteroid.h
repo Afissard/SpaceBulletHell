@@ -19,4 +19,6 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	void Init(FVector newInertia, int newMaxHealth);
 };

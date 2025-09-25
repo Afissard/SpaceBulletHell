@@ -24,6 +24,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Asteroid")
 	TSubclassOf<class AAsteroid> AsteroidClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	int PlayerScore = 0;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

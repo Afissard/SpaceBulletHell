@@ -3,8 +3,11 @@
 
 #include "UFO.h"
 
+#include "GameMaster.h"
 #include "PlayerShip.h"
+#include "Missile.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AUFO::AUFO()
@@ -18,17 +21,17 @@ AUFO::AUFO()
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 	RootComponent = SphereCollision;
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(SphereCollision);
 	
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-	if (SphereMesh.Succeeded())
-	{
-		StaticMesh->SetStaticMesh(SphereMesh.Object);
-	}
+	SpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("SpriteComponent"));
+	SpriteComponent->SetupAttachment(SphereCollision);
 
-	SetActorScale3D(FVector(0.3f, 0.3f, 0.3f));
-	StaticMesh->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
+	// Pour définir le sprite, utilisez un asset existant
+	static ConstructorHelpers::FObjectFinderOptional<UPaperSprite> SpriteAsset(TEXT("/Game/Sprites/UFO_Sprite.UFO_Sprite"));
+	if (SpriteAsset.Get())
+	{
+		SpriteComponent->SetSprite(SpriteAsset.Get());
+	}
+	
 	SphereCollision->SetRelativeScale3D(FVector(1.5f, 1.5f, 1.5f));
 	
 	// Movement
@@ -41,11 +44,6 @@ void AUFO::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AUFO::OnOverlap);	
-}
-
-int AUFO::GetDamagePower()
-{
-	return DamagePower;
 }
 
 // Called every frame
@@ -84,48 +82,34 @@ void AUFO::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 					 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 					 bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Collision with : %s"), *OtherActor->GetName());
-
 	if (OtherActor && OtherActor != this)
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("%s collided with : %s"), *GetActorNameOrLabel(), *OtherActor->GetName());
+
 		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
 		{
-			int OtherActorDamagePower = OtherUFO->GetDamagePower();
-			Health -= OtherActorDamagePower;
-			if (Health <= 0)
+			
+			AGameMaster* GM = Cast<AGameMaster>(UGameplayStatics::GetActorOfClass(GetWorld(), AGameMaster::StaticClass()));
+			if (GM)
 			{
 				if (APlayerShip* PlayerUFO = Cast<APlayerShip>(OtherUFO))
 				{
-					PlayerUFO->ScoreValue += ScoreValue;
+					GM->PlayerScore += ScoreValue;
 				}
+				if (AMissile* MissileUFO = Cast<AMissile>(OtherUFO))
+				{
+					GM->PlayerScore += ScoreValue;
+				}
+			}
+			
+			Health -= OtherUFO->DamagePower;
+			if (Health <= 0)
+			{
 				Destroy();
 			}
 		}
-		else
-		{
-			Destroy();
-		}
 	}
 }
-
-
-/*
-FVector AUFO::Seek()
-{
-	// 1. calculate the desired velocity
-	FVector vDesired = vTarget - vPosition;
-	// 2. normalize the desired velocity
-	vDesired.Normalize();
-	// 3. scale the desired velocity to the maximum speed
-	vDesired *= dMaxSpeed;
-	// 4. calculate the steering force
-	FVector vSteering = vDesired - vVelocity;
-	// 5. Limit Steering force to Max speed
-	vSteering = vSteering.GetClampedToMaxSize(dMaxSpeed);
-	vSteering.Z = 0.0f; // Keep movement in the XY plane
-	return vSteering;
-}
-*/
 
 void AUFO::SpaceMovementApplyForce(const FVector ForceToApply)
 {
