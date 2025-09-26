@@ -3,8 +3,10 @@
 
 #include "GameMaster.h"
 
+#include "EnemyShip.h"
 #include "PlayerShip.h"
 #include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
 
 // Sets default values
 AGameMaster::AGameMaster()
@@ -26,15 +28,45 @@ void AGameMaster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	TimeSinceLastSpawn += DeltaTime;
-	if (TimeSinceLastSpawn >= 1.f) {
-		for (int i=0; i<FMath::RandRange(0, SpawnRateAsteroid); i++)
-		{
-			spawnAsteroid();
-		}
-		TimeSinceLastSpawn = 0.f;
+
+	float TimeUntilNextBoss = 30.f - (TimeSinceLastBossRaid+(NumBossRaid+1%10)+(PlayerUpgrade+1%30));
+	//UE_LOG(LogTemp, Warning, TEXT("BOSS RAID in %f seconds"), TimeUntilNextBoss);
+	if (TimeUntilNextBoss <= 0.f && BossRaid == false && BossAlive == false)
+	{
+		BossRaid = true;
+		TimeSinceLastBossRaid = 0.f;
 	}
 
+	if (BossRaid == false && BossAlive == false)
+	{
+		TimeSinceLastSpawn += DeltaTime;
+		TimeSinceLastBossRaid += DeltaTime;
+		if (TimeSinceLastSpawn >= 1.f) {
+			for (int i=0; i<FMath::RandRange(0, SpawnRateAsteroid); i++)
+			{
+				spawnAsteroid();
+			}
+			TimeSinceLastSpawn = 0.f;
+		}
+	} else
+	{
+		// Destroy all asteroid
+		for (TActorIterator<AAsteroid> It(GetWorld()); It; ++It)
+		{
+			AAsteroid* Asteroid = *It;
+			if (Asteroid && !Asteroid->IsActorBeingDestroyed())
+			{
+				Asteroid->Kill();
+			}
+		}
+		if (!BossAlive)
+		{
+			spawnBoss();
+			BossRaid = false;
+			BossAlive = true;
+		}
+	}
+	
 	PlayerUpgrade = PlayerScore / 100;
 	
 	if (PreviousPlayerUpgrade != PlayerUpgrade)
@@ -59,7 +91,7 @@ void AGameMaster::spawnAsteroid()
 
 	// Choisit un angle aléatoire autour du joueur
 	//	float Angle = FMath::RandRange(0.f, 2 * PI);
-	float SpawnDistance = FMath::RandRange(1500.f, 2000.f); // Distance éloignée
+	float SpawnDistance = FMath::RandRange(2000.f, 2000.f); // Distance éloignée
 
 	// Calcule la position de spawn autour du joueur
 	float Angle = FMath::RandRange(-PI / 2, PI / 2); // De -90° à +90°
@@ -88,5 +120,26 @@ void AGameMaster::spawnAsteroid()
 	if (NewAsteroid)
 	{
 		NewAsteroid->Init(Inertia, MaxHealth);
+	}
+}
+
+void AGameMaster::spawnBoss()
+{
+	NumBossRaid ++;
+	
+	FVector SpawnLocation = FVector(500.f, 0.f, 0.f);
+	SetActorLocation(SpawnLocation);
+
+	FRotator SpawnRotation = FRotator(0.f, 180, 0.f);
+	FActorSpawnParameters SpawnParams;
+	
+	AEnemyShip* NewEnemyShip = GetWorld()->SpawnActor<AEnemyShip>(EnemyShipClass, SpawnLocation, SpawnRotation, SpawnParams);
+	if (NewEnemyShip)
+	{
+		int BossHealth = NumBossRaid*20;
+		int BossScoreValue = NumBossRaid*100;
+		NewEnemyShip->Init(BossHealth, BossScoreValue);
+
+		//UE_LOG(LogTemp, Warning, TEXT("BOSS SPAWNED"));
 	}
 }

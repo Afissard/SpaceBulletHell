@@ -2,14 +2,13 @@
 
 
 #include "PlayerShip.h"
-
 #include "Asteroid.h"
 #include "GameMaster.h"
 #include "Missile.h"
+#include "SpaceShip.h"
 #include "Kismet/GameplayStatics.h"
 
-APlayerShip::APlayerShip()
-	: AUFO() // Appelle le constructeur parent
+APlayerShip::APlayerShip(): ASpaceShip()
 {
 	SphereCollision->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
 }
@@ -45,13 +44,6 @@ void APlayerShip::Tick(float DeltaTime)
 		SetActorLocation(FVector(0.f, 0.f, Location.Z));
 		Health -= 1;
 	}
-
-	/*
-	if (Health <= 0)
-	{
-		Destroy();
-	}
-	*/
 }
 
 void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -68,23 +60,6 @@ void APlayerShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerShip::StopFireMissile);
 }
 
-void APlayerShip::ThrustForward(float Value)
-{
-	if (Value != 0.0f)
-	{
-		FVector Force = GetActorForwardVector() * Value * Acceleration;
-		SpaceMovementApplyForce(Force);
-	}
-}
-
-void APlayerShip::ThrustRight(float Value)
-{
-	if (Value != 0.0f)
-	{
-		FVector Force = GetActorRightVector() * Value * Acceleration;
-		SpaceMovementApplyForce(Force);
-	}
-}
 
 void APlayerShip::StartFireMissile()
 {
@@ -95,26 +70,6 @@ void APlayerShip::StartFireMissile()
 void APlayerShip::StopFireMissile()
 {
 	GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
-}
-
-void APlayerShip::FireProjectile()
-{
-	APlayerShip* Player = Cast<APlayerShip>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	if (!Player) return;
-
-	FVector Forward = Player->GetActorForwardVector();
-	FVector SpawnLocation = Player->GetActorLocation() + Forward * 75.f;
-
-	FVector MissileInertia = FVector(1.f, 0.f, 0.f) * 20.f;
-
-	FRotator SpawnRotation = FRotator::ZeroRotator;
-	FActorSpawnParameters SpawnParams;
-
-	AMissile* NewMissile = GetWorld()->SpawnActor<AMissile>(MissileClass, SpawnLocation, SpawnRotation, SpawnParams);
-	if (NewMissile)
-	{
-		NewMissile->Init(MissileInertia);
-	}
 }
 
 void APlayerShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -139,12 +94,6 @@ void APlayerShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 				
 				AsteroidUFO->Destroy();
 			}
-			/*
-			if (Health <= 0)
-			{
-				Destroy();
-			}
-			*/
 		}
 	}
 }

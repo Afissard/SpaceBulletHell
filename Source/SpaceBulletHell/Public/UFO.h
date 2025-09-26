@@ -62,5 +62,5 @@ public:
 	
 	void SpaceMovementApplyForce(const FVector ForceToApply);
 
-	void Kill();
+	virtual void Kill();
 };
