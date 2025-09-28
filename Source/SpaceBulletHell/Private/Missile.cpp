@@ -4,6 +4,8 @@
 #include "Missile.h"
 
 #include "Asteroid.h"
+#include "EnemyShip.h"
+#include "PlayerShip.h"
 
 /*
 FVector AUFO::Seek()
@@ -28,13 +30,14 @@ void AMissile::AMssile()
 	SphereCollision->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
 }
 
-void AMissile::Init(FVector newInertia)
+void AMissile::Init(FVector newInertia, bool spawnedByPlayer)
 {
 	Inertia = newInertia;
 	MaxHealth = 1;
 	Health = MaxHealth;
 	DamagePower = 2;
 	ScoreValue = 0;
+	IsSpawnedByPlayer = spawnedByPlayer;
 }
 
 void AMissile::Tick(float DeltaTime)
@@ -65,6 +68,20 @@ void AMissile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Other
 
 				// FIX: Mask the hitbox issues
 				//DamagePower = 0; // Prevents double damage if multiple collisions in the same frame
+			}
+
+			if (IsSpawnedByPlayer)
+			{
+				if (AEnemyShip* EnemyShipUFO = Cast<AEnemyShip>(OtherUFO))
+				{
+					ToBeDestroyedNextFrame = true;
+				}
+			} else
+			{
+				if (APlayerShip* PlayerShipUFO = Cast<APlayerShip>(OtherUFO))
+				{
+					ToBeDestroyedNextFrame = true;
+				}
 			}
 		}
 	}

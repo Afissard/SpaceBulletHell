@@ -98,7 +98,11 @@ void AUFO::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 				}
 				if (AMissile* MissileUFO = Cast<AMissile>(OtherUFO))
 				{
-					GM->PlayerScore += ScoreValue;
+					if (MissileUFO->IsSpawnedByPlayer)
+					{
+						GM->PlayerScore += ScoreValue;
+					}
+					MissileUFO->Destroy();
 				}
 			}
 			

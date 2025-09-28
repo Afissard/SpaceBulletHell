@@ -15,6 +15,12 @@ ASpaceShip::ASpaceShip(): AUFO()
 void ASpaceShip::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AGameMaster* GM = Cast<AGameMaster>(UGameplayStatics::GetActorOfClass(GetWorld(), AGameMaster::StaticClass()));
+	if (GM)
+	{
+		ProjectilesTraites.Add(GM);
+	}
 	
 	// Game variables
 	MaxHealth = 5;
@@ -29,28 +35,11 @@ void ASpaceShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Only for the player
-	FVector Location = GetActorLocation();
-	float WorldLimitX = 750.f;
-	float WorldLimitY = 1300.f;
-
-	if (
-		FMath::Abs(Location.X) > WorldLimitX ||
-		FMath::Abs(Location.Y) > WorldLimitY ||
-		FMath::Abs(Location.X) < WorldLimitX*(-1) ||
-		FMath::Abs(Location.Y) < WorldLimitY*(-1)
-		)
+	if (InvincibilityTimer > 0.f)
 	{
-		SetActorLocation(FVector(0.f, 0.f, Location.Z));
-		Health -= 1;
+		InvincibilityTimer -= DeltaTime;
 	}
-
-	/*
-	if (Health <= 0)
-	{
-		Destroy();
-	}
-	*/
+	
 }
 
 void ASpaceShip::ThrustForward(float Value)
@@ -73,20 +62,21 @@ void ASpaceShip::ThrustRight(float Value)
 
 void ASpaceShip::FireProjectile()
 {
-	ASpaceShip* Player = Cast<ASpaceShip>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	if (!Player) return;
+	
+}
 
-	FVector Forward = Player->GetActorForwardVector();
-	FVector SpawnLocation = Player->GetActorLocation() + Forward * 75.f;
-
-	FVector MissileInertia = FVector(1.f, 0.f, 0.f) * 20.f;
-
-	FRotator SpawnRotation = FRotator::ZeroRotator;
-	FActorSpawnParameters SpawnParams;
-
-	AMissile* NewMissile = GetWorld()->SpawnActor<AMissile>(MissileClass, SpawnLocation, SpawnRotation, SpawnParams);
-	if (NewMissile)
+void ASpaceShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+				   bool bFromSweep, const FHitResult& SweepResult
+				   )
+{
+	if (OtherActor && OtherActor != this && InvincibilityTimer <= 0.f && !ProjectilesTraites.Contains(OtherActor))
 	{
-		NewMissile->Init(MissileInertia);
+		
+		if (ProjectilesTraites.Contains(OtherActor))
+		{
+			ProjectilesTraites.Add(OtherActor);
+			InvincibilityTimer = InvincibilityTime;
+		}
 	}
 }

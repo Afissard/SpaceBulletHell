@@ -2,10 +2,11 @@
 
 
 #include "EnemyShip.h"
-
+#include "EnemyMissile.h"
 #include "GameMaster.h"
 #include "Missile.h"
 #include "PlayerShip.h"
+#include "PlayerMissile.h"
 #include "Kismet/GameplayStatics.h"
 
 AEnemyShip::AEnemyShip()
@@ -33,6 +34,12 @@ void AEnemyShip::Tick(float DeltaTime)
 	{
 		Kill();
 	}
+
+	if (InvincibilityTimer > 0.f)
+	{
+		InvincibilityTimer -= DeltaTime;
+	}
+	
 	
 	//UE_LOG(LogTemp, Warning, TEXT("BOSS position %s"), *GetActorLocation().ToString());
 	
@@ -52,7 +59,12 @@ void AEnemyShip::Tick(float DeltaTime)
 		ThrustRight(Acceleration*(-1));
 	}
 
-	// TODO: add shooting behavior
+	TimeSinceLastShot += DeltaTime;
+	if (TimeSinceLastShot >= FireInterval)
+	{
+		FireProjectile();
+		TimeSinceLastShot = 0.f;
+	}
 }
 
 void AEnemyShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -60,18 +72,22 @@ void AEnemyShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 				   bool bFromSweep, const FHitResult& SweepResult
 				   )
 {
-	//Super::OnOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	Super::OnOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-	if (OtherActor && OtherActor != this)
+	if (OtherActor && OtherActor != this && InvincibilityTimer <= 0.f && !ProjectilesTraites.Contains(OtherActor))
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("%s collided with : %s"), *GetActorNameOrLabel(), *OtherActor->GetName());
 
 		if (AUFO* OtherUFO = Cast<AUFO>(OtherActor))
 		{
-			if (AMissile* MissileUFO = Cast<AMissile>(OtherUFO))
+			if (APlayerMissile* MissileUFO = Cast<APlayerMissile>(OtherUFO))
 			{
-				Health -= MissileUFO->DamagePower;
-				MissileUFO->Destroy();
+				UE_LOG(LogTemp, Warning, TEXT("%s is: %d"), *OtherActor->GetName(), MissileUFO->IsSpawnedByPlayer);
+				if (MissileUFO->IsSpawnedByPlayer)
+				{
+					Health -= MissileUFO->DamagePower;
+					MissileUFO->Destroy();
+				}
 			}
 
 			if (APlayerShip* PlayerUFO = Cast<APlayerShip>(OtherUFO))
@@ -98,4 +114,39 @@ void AEnemyShip::Kill()
 		GM->BossAlive = false;
 	}
 	Super::Kill();
+}
+
+void AEnemyShip::FireProjectile()
+{
+	ASpaceShip* Player = Cast<ASpaceShip>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!Player) return;
+
+	FVector Forward = (Player->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+	FVector SpawnLocation = GetActorLocation() + Forward * 1.f;
+
+	// Angles en degrés pour les tirs
+	float LeftAngle = -30.f;
+	float RightAngle = 30.f;
+	float RandomAngle = FMath::FRandRange(-20.f, 20.f);
+
+	TArray<float> Angles = {LeftAngle, RandomAngle, RightAngle};
+
+	for (float Angle : Angles)
+	{
+		// Calcul de la direction avec rotation autour de l'axe Z
+		FRotator Rot = Forward.Rotation();
+		Rot.Yaw += Angle;
+		FVector Dir = Rot.Vector();
+
+		FVector MissileInertia = Dir * 20.f;
+		FRotator SpawnRotation = Dir.Rotation();
+		FActorSpawnParameters SpawnParams;
+
+		AEnemyMissile* NewMissile = GetWorld()->SpawnActor<AEnemyMissile>(EnemyMissileClass, SpawnLocation, SpawnRotation, SpawnParams);
+		if (NewMissile)
+		{
+			NewMissile->Init(MissileInertia, false);
+			//UE_LOG(LogTemp, Warning, TEXT("EnemyShip FIRE Inertia: %s"), *MissileInertia.ToString());
+		}
+	}
 }

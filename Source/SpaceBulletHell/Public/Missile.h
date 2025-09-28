@@ -17,11 +17,13 @@ class SPACEBULLETHELL_API AMissile : public AUFO
 	bool ToBeDestroyedNextFrame = false;
 
 public:
+	bool IsSpawnedByPlayer;
+	
 	void AMssile();
 	
 	virtual void Tick(float DeltaTime) override;
 
-	void Init(FVector newInertia);
+	void Init(FVector newInertia, bool spawnedByPlayer);
 
 	void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,

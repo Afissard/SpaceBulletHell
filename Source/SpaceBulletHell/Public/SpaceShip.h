@@ -27,6 +27,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Missile")
 	TSubclassOf<class AMissile> MissileClass;
+
+	TSet<AActor*> ProjectilesTraites;
+	float InvincibilityTime = 0.5f;
+	float InvincibilityTimer = 0.f;
 	
 	virtual void Tick(float DeltaTime) override;
 	
@@ -34,7 +38,11 @@ public:
 	void ThrustForward(float Value);
 	UFUNCTION()
 	void ThrustRight(float Value);
-	UFUNCTION()
-	void FireProjectile();
+	virtual void FireProjectile();
+
+	virtual void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+				   bool bFromSweep, const FHitResult& SweepResult
+				   ) override;
 	
 };

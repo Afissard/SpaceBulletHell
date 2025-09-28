@@ -3,6 +3,7 @@
 
 #include "PlayerShip.h"
 #include "Asteroid.h"
+#include "EnemyShip.h"
 #include "GameMaster.h"
 #include "Missile.h"
 #include "SpaceShip.h"
@@ -76,7 +77,9 @@ void APlayerShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 				   bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != this)
+	Super::OnOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+	if (OtherActor && OtherActor != this && InvincibilityTimer <= 0.f && !ProjectilesTraites.Contains(OtherActor))
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("%s collided with : %s"), *GetActorNameOrLabel(), *OtherActor->GetName());
 
@@ -92,8 +95,41 @@ void APlayerShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 					GM->PlayerScore += AsteroidUFO->ScoreValue;
 				}
 				
-				AsteroidUFO->Destroy();
+				AsteroidUFO->Kill();
+			}
+
+			if (AEnemyShip* EnemyShipUFO = Cast<AEnemyShip>(OtherUFO))
+			{
+				Health -= EnemyShipUFO->DamagePower;
+			}
+			if (AMissile* MissileUFO = Cast<AMissile>(OtherUFO))
+			{
+				if (!MissileUFO->IsSpawnedByPlayer)
+				{
+					Health -= MissileUFO->DamagePower;
+					MissileUFO->Destroy();
+				}
 			}
 		}
+	}
+}
+
+void APlayerShip::FireProjectile()
+{
+	ASpaceShip* Player = Cast<ASpaceShip>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!Player) return;
+
+	FVector Forward = Player->GetActorForwardVector();
+	FVector SpawnLocation = Player->GetActorLocation() + Forward * 75.f;
+
+	FVector MissileInertia = FVector(1.f, 0.f, 0.f) * 20.f;
+
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+	FActorSpawnParameters SpawnParams;
+
+	APlayerMissile* NewMissile = GetWorld()->SpawnActor<APlayerMissile>(PlayerMissileClass, SpawnLocation, SpawnRotation, SpawnParams);
+    if (NewMissile)
+	{
+		NewMissile->Init(MissileInertia, true);
 	}
 }
