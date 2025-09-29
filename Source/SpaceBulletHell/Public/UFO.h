@@ -34,7 +34,11 @@ public:
 	int ScoreValue = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
 	int DamagePower = 1;
-
+	/*
+	UPROPERTY(EditAnywhere, Category="Particles")
+	class UParticleSystem* Particle;
+	*/
+	
 	// Movement variables
 	FVector Inertia = FVector(0, 0, 0);
 	UPROPERTY(VisibleAnywhere)

@@ -43,7 +43,7 @@ AUFO::AUFO()
 void AUFO::BeginPlay()
 {
 	Super::BeginPlay();
-	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AUFO::OnOverlap);	
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AUFO::OnOverlap);
 }
 
 // Called every frame
@@ -133,6 +133,7 @@ void AUFO::SpaceMovementApplyForce(const FVector ForceToApply)
 
 void AUFO::Kill()
 {
-	// TODO : add explosion particles + sound
+	// TODO particles, sound, etc.
+	
 	Destroy();
 }
