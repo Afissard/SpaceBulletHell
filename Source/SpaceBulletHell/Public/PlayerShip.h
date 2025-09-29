@@ -17,9 +17,6 @@ class SPACEBULLETHELL_API APlayerShip : public ASpaceShip
 
 	int PlayerScore = 0;
 
-	UPROPERTY(EditAnywhere, Category = "Shooting")
-	TSubclassOf<APlayerMissile> PlayerMissileClass;
-
 public:
 	APlayerShip();
 
@@ -33,8 +30,10 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	
 	FTimerHandle FireTimerHandle;
-	UPROPERTY(EditAnywhere, Category = "Missile")
+	UPROPERTY(EditAnywhere, Category = "Shooting")
 	float FireInterval = 0.2f; // Intervalle entre tirs
+	UPROPERTY(EditAnywhere, Category = "Shooting")
+	TSubclassOf<APlayerMissile> PlayerMissileClass;
 
 	void StartFireMissile();
 	void StopFireMissile();

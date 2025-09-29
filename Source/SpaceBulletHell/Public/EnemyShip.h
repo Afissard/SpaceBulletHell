@@ -16,13 +16,8 @@ class SPACEBULLETHELL_API AEnemyShip : public ASpaceShip
 	GENERATED_BODY()
 
 	bool goRight = true;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shooting", meta = (AllowPrivateAccess = "true"))
-	float FireInterval = 0.4f;
 	float TimeSinceLastShot = 0.f;
-	float Acceleration = 50.0f;
-
-	UPROPERTY(EditAnywhere, Category = "Shooting")
-	TSubclassOf<AEnemyMissile> EnemyMissileClass;
+	
 
 public:
 	AEnemyShip();
@@ -31,6 +26,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shooting")
+	float FireInterval = 0.6f;
+	UPROPERTY(EditAnywhere, Category = "Shooting")
+	TSubclassOf<AEnemyMissile> EnemyMissileClass;
+
+	
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

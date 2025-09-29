@@ -25,9 +25,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float Acceleration = 100.0f;
 
+	/*
 	UPROPERTY(EditAnywhere, Category = "Missile")
 	TSubclassOf<class AMissile> MissileClass;
-
+	*/
+	
 	TSet<AActor*> ProjectilesTraites;
 	float InvincibilityTime = 0.5f;
 	float InvincibilityTimer = 0.f;

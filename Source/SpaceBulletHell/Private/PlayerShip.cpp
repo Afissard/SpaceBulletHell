@@ -24,7 +24,7 @@ void APlayerShip::BeginPlay()
 	DamagePower = 0;
 	ScoreValue = 0;
 
-	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &APlayerShip::OnOverlap);
+	SphereCollision->OnComponentBeginOverlap.AddUniqueDynamic(this, &APlayerShip::OnOverlap);
 }
 
 void APlayerShip::Tick(float DeltaTime)
@@ -102,13 +102,10 @@ void APlayerShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			{
 				Health -= EnemyShipUFO->DamagePower;
 			}
-			if (AMissile* MissileUFO = Cast<AMissile>(OtherUFO))
+			if (AEnemyMissile* MissileUFO = Cast<AEnemyMissile>(OtherUFO))
 			{
-				if (!MissileUFO->IsSpawnedByPlayer)
-				{
-					Health -= MissileUFO->DamagePower;
-					MissileUFO->Destroy();
-				}
+				Health -= MissileUFO->DamagePower;
+				MissileUFO->Destroy();
 			}
 		}
 	}

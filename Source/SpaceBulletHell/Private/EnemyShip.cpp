@@ -21,10 +21,10 @@ void AEnemyShip::BeginPlay()
 	// Game variables
 	MaxHealth = 20;
 	Health = MaxHealth;
-	DamagePower = 100; // dissuasion
+	DamagePower = 5; // dissuasion
 	ScoreValue = 0;
 
-	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemyShip::OnOverlap);
+	SphereCollision->OnComponentBeginOverlap.AddUniqueDynamic(this, &AEnemyShip::OnOverlap);
 }
 
 void AEnemyShip::Tick(float DeltaTime)
@@ -40,13 +40,10 @@ void AEnemyShip::Tick(float DeltaTime)
 		InvincibilityTimer -= DeltaTime;
 	}
 	
-	
-	//UE_LOG(LogTemp, Warning, TEXT("BOSS position %s"), *GetActorLocation().ToString());
-	
-	if (GetActorLocation().Y > 500.f)
+	if (GetActorLocation().Y > 200.f)
 	{
 		goRight = true;
-	} else if (GetActorLocation().Y < -500.f)
+	} else if (GetActorLocation().Y < -200.f)
 	{
 		goRight = false;
 	}
@@ -72,7 +69,7 @@ void AEnemyShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 				   bool bFromSweep, const FHitResult& SweepResult
 				   )
 {
-	Super::OnOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	//Super::OnOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
 	if (OtherActor && OtherActor != this && InvincibilityTimer <= 0.f && !ProjectilesTraites.Contains(OtherActor))
 	{
@@ -82,18 +79,17 @@ void AEnemyShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		{
 			if (APlayerMissile* MissileUFO = Cast<APlayerMissile>(OtherUFO))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("%s is: %d"), *OtherActor->GetName(), MissileUFO->IsSpawnedByPlayer);
-				if (MissileUFO->IsSpawnedByPlayer)
-				{
-					Health -= MissileUFO->DamagePower;
-					MissileUFO->Destroy();
-				}
+				//UE_LOG(LogTemp, Warning, TEXT("%s is: %d"), *OtherActor->GetName(), MissileUFO->IsSpawnedByPlayer);
+				Health -= MissileUFO->DamagePower;
+				MissileUFO->Destroy();
 			}
 
 			if (APlayerShip* PlayerUFO = Cast<APlayerShip>(OtherUFO))
 			{
 				Health -= PlayerUFO->DamagePower;
 			}
+
+			UE_LOG(LogTemp, Warning, TEXT("BOSS health %i"), Health);
 		}
 	}
 }

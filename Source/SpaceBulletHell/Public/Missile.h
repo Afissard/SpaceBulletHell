@@ -14,18 +14,19 @@ class SPACEBULLETHELL_API AMissile : public AUFO
 {
 	GENERATED_BODY()
 
-	bool ToBeDestroyedNextFrame = false;
-
 public:
 	bool IsSpawnedByPlayer;
+	bool ToBeDestroyedNextFrame = false;
 	
 	void AMssile();
+
+	virtual void BeginPlay() override;
 	
 	virtual void Tick(float DeltaTime) override;
 
 	void Init(FVector newInertia, bool spawnedByPlayer);
 
-	void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	virtual void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 				   bool bFromSweep, const FHitResult& SweepResult
 				   ) override;

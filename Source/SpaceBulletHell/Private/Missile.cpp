@@ -40,6 +40,13 @@ void AMissile::Init(FVector newInertia, bool spawnedByPlayer)
 	IsSpawnedByPlayer = spawnedByPlayer;
 }
 
+void AMissile::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	SphereCollision->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMissile::OnOverlap);
+}
+
 void AMissile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

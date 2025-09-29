@@ -28,7 +28,7 @@ void ASpaceShip::BeginPlay()
 	DamagePower = 0;
 	ScoreValue = 0;
 
-	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ASpaceShip::OnOverlap);
+	//SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ASpaceShip::OnOverlap);
 }
 
 void ASpaceShip::Tick(float DeltaTime)
@@ -64,6 +64,7 @@ void ASpaceShip::FireProjectile()
 {
 	
 }
+
 
 void ASpaceShip::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 				   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
