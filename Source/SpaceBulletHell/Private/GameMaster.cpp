@@ -136,7 +136,7 @@ void AGameMaster::spawnBoss()
 	AEnemyShip* NewEnemyShip = GetWorld()->SpawnActor<AEnemyShip>(EnemyShipClass, SpawnLocation, SpawnRotation, SpawnParams);
 	if (NewEnemyShip)
 	{
-		int BossHealth = NumBossRaid*10;
+		int BossHealth = NumBossRaid*5;
 		int BossScoreValue = NumBossRaid*100;
 		NewEnemyShip->Init(BossHealth, BossScoreValue);
 
